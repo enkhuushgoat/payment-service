@@ -1,0 +1,71 @@
+{
+  "name": "payment-service",
+  "version": "0.0.0",
+  "description": "A serverless framework template for typescript",
+  "main": "serverless.ts",
+  "private": true,
+  "scripts": {
+    "offline": "serverless offline start",
+    "build": "npx tsc",
+    "lint": "eslint",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "format:check": "prettier --check \"src/**/*.ts\"",
+    "deploy:prod": "serverless deploy --stage prod",
+    "deploy:dev": "serverless deploy --stage dev",
+    "deploy:staging": "serverless deploy --stage staging",
+    "remove:dev": "serverless remove --stage dev",
+    "remove:staging": "serverless remove --stage staging",
+    "remove:prod": "serverless remove --stage prod",
+    "logs:dev": "serverless logs --stage dev",
+    "logs:staging": "serverless logs --stage staging",
+    "logs:prod": "serverless logs --stage prod",
+    "invoke:local": "serverless invoke local",
+    "test": "vitest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/enkhuushz/payment-service.git"
+  },
+  "keywords": [
+    "serverless",
+    "template"
+  ],
+  "author": "enkhuushz",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/enkhuushz/payment-service/issues"
+  },
+  "packageManager": "pnpm@10.11.0",
+  "homepage": "https://github.com/enkhuushz/payment-service#readme",
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.749.0",
+    "@aws-sdk/client-lambda": "^3.749.0",
+    "@aws-sdk/client-ssm": "^3.749.0",
+    "@aws-sdk/lib-dynamodb": "^3.749.0",
+    "aws-lambda": "^1.0.7",
+    "axios": "^1.7.9",
+    "winston": "^3.17.0",
+    "zod": "^3.24.2",
+    "@types/jsonwebtoken": "^9.0.7",
+    "jsonwebtoken": "^9.0.2",
+    "uuid": "^11.1.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.20.0",
+    "@middy/core": "^4.7.0",
+    "@middy/http-json-body-parser": "^4.7.0",
+    "@serverless/eslint-config": "^5.1.0",
+    "@serverless/typescript": "^3.38.0",
+    "@types/aws-lambda": "^8.10.147",
+    "@types/node": "^22.13.4",
+    "eslint": "^9.27.0",
+    "globals": "^15.15.0",
+    "prettier": "^3.5.1",
+    "serverless": "^4.6.2",
+    "serverless-offline": "^14.4.0",
+    "serverless-prune-plugin": "^2.1.0",
+    "typescript-eslint": "^8.24.0",
+    "vitest": "^3.1.4",
+    "@vitest/coverage-v8": "^3.2.4"
+  }
+}
