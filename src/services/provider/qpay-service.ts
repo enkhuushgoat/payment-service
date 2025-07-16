@@ -18,6 +18,21 @@ type QpayInvoiceVerificationResult = {
   rows: any[];
 };
 
+type QpayInvoiceResponse = {
+  invoice_id: string;
+  amount: number;
+  qr_text: string;
+  qr_image: string;
+  urls: [
+    {
+      name: string;
+      description: string;
+      logo: string;
+      link: string;
+    },
+  ];
+};
+
 export class PaymentProviderQpay {
   authObj: PaymentProviderAuthObj | null = null;
   async auth(): Promise<any | null> {
@@ -53,7 +68,7 @@ export class PaymentProviderQpay {
     }
   }
 
-  async createInvoice(invoiceNo: string, amount: number, description: string): Promise<any | null> {
+  async createInvoice(invoiceNo: string, amount: number, description: string): Promise<QpayInvoiceResponse | null> {
     try {
       const URL = `${QPAY_V2_URL}/v2/invoice`;
       const CALLBACK_URL = this.generateCallbackUrl(invoiceNo);
@@ -72,7 +87,7 @@ export class PaymentProviderQpay {
         headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
       });
       console.log('response', response.data);
-      const invoiceData = response.data;
+      const invoiceData = response.data as QpayInvoiceResponse;
       if (!invoiceData || !invoiceData.invoice_id) {
         logger.error(`Invalid response from Qpay:`, invoiceData);
         throw new Error(`Invalid response from Qpay`);

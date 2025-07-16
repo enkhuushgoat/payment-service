@@ -10,6 +10,8 @@ import {
   QueryCommandInput,
   PutCommandInput,
   UpdateCommandInput,
+  DeleteCommand,
+  DeleteCommandInput,
 } from '@aws-sdk/lib-dynamodb';
 import { DynamoDBDocumentClient } from '@aws-sdk/lib-dynamodb';
 import { logger } from '@/libs';
@@ -59,5 +61,13 @@ export async function updateRecord<T>(input: UpdateCommandInput): Promise<T | un
   } catch (error: unknown) {
     logger.error(`Error updating record in table "${input.TableName}": ${error}`);
     throw error instanceof Error ? error : new CustomError('Unexpected error while updating record.');
+  }
+}
+export async function deleteRecord(input: DeleteCommandInput): Promise<void> {
+  try {
+    await docClient.send(new DeleteCommand(input));
+  } catch (error: unknown) {
+    logger.error(`Error deleting record from table "${input.TableName}": ${error}`);
+    throw error instanceof Error ? error : new CustomError('Unexpected error while deleting record.');
   }
 }

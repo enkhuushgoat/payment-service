@@ -14,8 +14,14 @@ const createInvoiceFunc: ApiFunc<null> = async (event): Promise<ApiFuncRes> => {
     if (!userId || !body) {
       throw new CustomError('Unauthorized: Admin access required', 403);
     }
+    const { packageType } = body;
 
-    const invoice = await invoiceService.createInvoice(userId, body.packageId);
+    const invoice = await invoiceService.createInvoice(userId, packageType);
+
+    if (!invoice) {
+      throw new CustomError('Failed to create invoice', 500);
+    }
+
     return formatApiResponse(invoice);
   } catch (error: unknown) {
     return handleApiFuncError(error);
