@@ -12,10 +12,10 @@ const extractJWTDataWithoutVerification = (token: string): JWTPayload => {
     const decoded = jwt.decode(token, { complete: true });
     if (decoded) return decoded.payload as JWTPayload;
 
-    throw new Error('Invalid token');
+    return { sub: '', email: '', 'cognito:groups': [] };
   } catch (error) {
     console.error('Error in extractJWTDataWithoutVerification:', error);
-    throw error;
+    return { sub: '', email: '', 'cognito:groups': [] };
   }
 };
 
@@ -24,13 +24,13 @@ const getUserIdFromTokenWithoutVerification = (token: string): { userId: string;
     const decodedToken = extractJWTDataWithoutVerification(token);
 
     if (!decodedToken?.sub) {
-      throw new Error('No sub claim in token');
+      return { userId: '', email: '', groups: [] };
     }
 
     return { userId: decodedToken.sub, email: decodedToken.email, groups: decodedToken['cognito:groups'] };
   } catch (error) {
     console.error('Error in getUserIdFromTokenWithoutVerification:', error);
-    throw error;
+    return { userId: '', email: '', groups: [] };
   }
 };
 

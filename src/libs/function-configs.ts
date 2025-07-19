@@ -5,7 +5,15 @@ export function generatePathname(context: string): string {
 export const defaultApiFunctionConfig = {
   cors: {
     origin: '*',
-    headers: ['Content-Type', 'X-Amz-Date', 'Authorization', 'X-Api-Key', 'X-Amz-Security-Token', 'X-Amz-User-Agent'],
+    headers: [
+      'Content-Type',
+      'X-Amz-Date',
+      'Authorization',
+      'X-Api-Key',
+      'X-Amz-Security-Token',
+      'X-Amz-User-Agent',
+      'verifytoken',
+    ],
   },
 };
 
@@ -18,6 +26,14 @@ export const authenticatedApiFunctionConfig = {
   },
   cors: {
     origin: '*',
-    headers: ['Content-Type', 'X-Amz-Date', 'Authorization', 'X-Api-Key', 'X-Amz-Security-Token', 'X-Amz-User-Agent'],
+    headers: [
+      'Content-Type',
+      'X-Amz-Date',
+      'Authorization',
+      'X-Api-Key',
+      'X-Amz-Security-Token',
+      'X-Amz-User-Agent',
+      'verifytoken',
+    ],
   },
 };

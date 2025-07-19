@@ -18,7 +18,10 @@ import { logger } from '@/libs';
 import { CustomError } from '@/error';
 
 // Initialize DynamoDB client
-const dynamoDb = new DynamoDBClient({ region: 'ap-southeast-1', profile: 'goat' });
+const dynamoDb = new DynamoDBClient({
+  region: 'ap-southeast-1',
+  // profile: 'goat',
+});
 const docClient = DynamoDBDocumentClient.from(dynamoDb);
 
 export async function getRecordByKey<T>(input: GetCommandInput): Promise<T | undefined> {
@@ -63,6 +66,7 @@ export async function updateRecord<T>(input: UpdateCommandInput): Promise<T | un
     throw error instanceof Error ? error : new CustomError('Unexpected error while updating record.');
   }
 }
+
 export async function deleteRecord(input: DeleteCommandInput): Promise<void> {
   try {
     await docClient.send(new DeleteCommand(input));

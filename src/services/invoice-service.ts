@@ -11,6 +11,7 @@ import {
 } from '@/repository/invoice-repository';
 import { CustomError } from '@/error';
 import { createSubscriptionService } from './subscription-service';
+import { HistoryInvoice } from '@/types/invoice';
 
 const qpayProvider = new PaymentProviderQpay();
 
@@ -50,7 +51,8 @@ export class InvoiceService {
       createdAt: now,
       updatedAt: now,
       qpayData: qpayInvoice,
-    };
+      expiresAt,
+    } as HistoryInvoice;
 
     await createHistory(historyInvoice);
     return historyInvoice;
@@ -75,7 +77,7 @@ export class InvoiceService {
       throw new CustomError('Failed to update invoice', 500);
     }
 
-    await createSubscriptionService(invoice.userId, invoice);
+    // await createSubscriptionService(invoice.userId, invoice);
     await deleteActive(invoice.userId, invoice.packageType);
 
     return true;

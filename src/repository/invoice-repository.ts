@@ -1,8 +1,38 @@
 import { createRecord, deleteRecord, getRecordByKey, queryRecords, updateRecord } from '@/dynamo';
-import { Invoice } from '@/types/invoice';
+import { ActiveInvoice, HistoryInvoice, Invoice } from '@/types/invoice';
 import { UpdateCommandInput } from '@aws-sdk/lib-dynamodb';
 
 const TABLE_NAME = 'invoice';
+
+async function createActiveInvoicePreOrder(activeInvoice: ActiveInvoice): Promise<Invoice | undefined> {
+  const pkValue = `${activeInvoice.email}#${activeInvoice.packageType}`;
+  const params = {
+    TableName: TABLE_NAME,
+    Key: {
+      PK: pkValue,
+      SK: 'active',
+    },
+    UpdateExpression:
+      'SET invoiceId = :invoiceId, createdAt = :createdAt, expiresAt = :expiresAt, email = :email, packageType = :packageType, amount = :amount, #status = :status, isPreOrder = :isPreOrder',
+    ConditionExpression: 'attribute_not_exists(PK) OR (attribute_exists(PK) AND attribute_not_exists(#qpayData))',
+    ExpressionAttributeNames: {
+      '#qpayData': 'qpayData',
+      '#status': 'status',
+    },
+    ExpressionAttributeValues: {
+      ':invoiceId': activeInvoice.invoiceId,
+      ':createdAt': activeInvoice.createdAt,
+      ':expiresAt': activeInvoice.expiresAt,
+      ':email': activeInvoice.email,
+      ':packageType': activeInvoice.packageType,
+      ':amount': activeInvoice.amount,
+      ':status': activeInvoice.status,
+      ':isPreOrder': activeInvoice.isPreOrder,
+    },
+  };
+  console.log(`createActiveInvoice: ${JSON.stringify(params)}`);
+  return await updateRecord<Invoice>(params);
+}
 
 async function createActiveInvoice(
   userId: string,
@@ -20,7 +50,7 @@ async function createActiveInvoice(
     },
     UpdateExpression:
       'SET invoiceId = :invoiceId, createdAt = :createdAt, expiresAt = :expiresAt, userId = :userId, packageType = :packageType',
-    ConditionExpression: 'attribute_not_exists(PK)',
+    ConditionExpression: 'attribute_not_exists(PK) OR (attribute_exists(PK) AND attribute_not_exists(qpayData))',
     ExpressionAttributeValues: {
       ':invoiceId': invoiceId,
       ':createdAt': createdAt,
@@ -33,7 +63,11 @@ async function createActiveInvoice(
   return await updateRecord<Invoice>(params);
 }
 
-async function updateActiveWithQpay(userId: string, packageType: string, qpayData: any): Promise<Invoice | undefined> {
+async function updateActiveWithQpay(
+  userId: string,
+  packageType: string,
+  qpayData: any
+): Promise<ActiveInvoice | undefined> {
   const pkValue = `${userId}#${packageType}`;
   const params = {
     TableName: TABLE_NAME,
@@ -48,25 +82,25 @@ async function updateActiveWithQpay(userId: string, packageType: string, qpayDat
     },
   };
 
-  return await updateRecord<Invoice>(params);
+  return await updateRecord<ActiveInvoice>(params);
 }
 
-async function getActiveForPackage(userId: string, packageType: string): Promise<Invoice | undefined> {
+async function getActiveForPackage(userId: string, packageType: string): Promise<ActiveInvoice | undefined> {
   const pkValue = `${userId}#${packageType}`;
   const params = {
     TableName: TABLE_NAME,
     Key: { PK: pkValue, SK: 'active' },
   };
-  return await getRecordByKey<Invoice>(params);
+  return await getRecordByKey<ActiveInvoice>(params);
 }
 
-async function createHistory(history: any): Promise<Invoice | undefined> {
+async function createHistory(history: HistoryInvoice): Promise<HistoryInvoice | undefined> {
   const params = {
     TableName: TABLE_NAME,
     Item: history,
   };
 
-  return await createRecord<Invoice>(params);
+  return await createRecord<HistoryInvoice>(params);
 }
 
 async function getInvoice(id: string): Promise<Invoice | undefined> {
@@ -121,6 +155,7 @@ export {
   getInvoice,
   updateInvoice,
   createActiveInvoice,
+  createActiveInvoicePreOrder,
   updateActiveWithQpay,
   createHistory,
   getActiveForPackage,

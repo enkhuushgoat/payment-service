@@ -1,5 +1,5 @@
 import type { AWS } from '@serverless/typescript';
-import { createInvoice, verifyInvoice } from './src/functions/api';
+import { createInvoice, verifyInvoice, createPreOrderInvoice, verifyPreOrderInvoice } from './src/functions/api';
 
 const serverlessConfig: AWS = {
   service: 'payment-service',
@@ -13,17 +13,46 @@ const serverlessConfig: AWS = {
     region: 'ap-southeast-1',
     profile: 'goat',
     logRetentionInDays: 365,
+    iam: {
+      role: {
+        statements: [
+          {
+            Effect: 'Allow',
+            Action: [
+              'dynamodb:Query',
+              'dynamodb:GetItem',
+              'dynamodb:PutItem',
+              'dynamodb:UpdateItem',
+              'dynamodb:DeleteItem',
+            ],
+            Resource: [
+              'arn:aws:dynamodb:${self:provider.region}:*:table/invoice',
+              'arn:aws:dynamodb:${self:provider.region}:*:table/invoice/index/*',
+              'arn:aws:dynamodb:${self:provider.region}:*:table/subscription',
+              'arn:aws:dynamodb:${self:provider.region}:*:table/subscription/index/*',
+              'arn:aws:dynamodb:${self:provider.region}:*:table/subscription-history',
+              'arn:aws:dynamodb:${self:provider.region}:*:table/subscription-history/index/*',
+              'arn:aws:dynamodb:${self:provider.region}:*:table/pre-order',
+              'arn:aws:dynamodb:${self:provider.region}:*:table/pre-order/index/*',
+            ],
+          },
+        ],
+      },
+    },
     environment: {
       QPAY_V2_URL: 'https://merchant-sandbox.qpay.mn',
       QPAY_USERNAME: 'TEST_MERCHANT',
       QPAY_PASSWORD: '123456',
       QPAY_INVOICE_CODE: 'TEST_INVOICE',
       BASE_URL: 'https://api.milloingoats.com',
+      CF_CAPTCHA_SECRET_KEY: '${ssm:/cloudflare/captcha/secret-key}',
     },
   },
   functions: {
     createInvoice,
     verifyInvoice,
+    createPreOrderInvoice,
+    verifyPreOrderInvoice,
   },
   package: { individually: true },
   resources: {
